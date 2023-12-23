@@ -21,7 +21,7 @@ export default {
 		// Check if the URL path starts with URL_PREFIX
 
 		if (env.URL_PREFIX && !urlPath.startsWith(env.URL_PREFIX)) {
-			return new Response('Forbidden', { status: 403 });
+			return new Response(JSON.stringify({ message: 'Forbidden' }), { status: 403 });
 		}
 
 		try {
