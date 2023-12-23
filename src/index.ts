@@ -33,7 +33,6 @@ export default {
 					text,
 					target_lang: target_lang === "zh-CN" ? "chinese" : target_lang
 				};
-				console.log(target_lang, source_lang);
 				if (source_lang && source_lang !== "auto") {
 					aiParams.source_lang = source_lang;
 				}
