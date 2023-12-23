@@ -8,11 +8,11 @@ export interface Env {
 export default {
 	async fetch(request: Request, env: Env) {
 		if (request.method !== 'POST') {
-			return new Response('Method Not Allowed', { status: 405 });
+			return new Response(JSON.stringify({ message: 'Method Not Allowed' }), { status: 405 });
 		}
 
 		if (!request.headers.get('Content-Type')?.includes('application/json')) {
-			return new Response('Unsupported Media Type', { status: 415 });
+			return new Response(JSON.stringify({ message: 'Unsupported Media Type' }), { status: 415 });
 		}
 
 		// Extract the URL path
@@ -28,12 +28,14 @@ export default {
 			const ai = new Ai(env.AI);
 
 			const { source_lang, target_lang, text_list } = await request.json() as any;
+			if (!Array.isArray(text_list) || !text_list.length) {
+				return new Response(JSON.stringify({ message: 'Invalid text_list' }), { status: 400 });
+			}
 			const translations = await Promise.all(text_list.map(async (text: string) => {
 				const aiParams: any = {
 					text,
 					target_lang: target_lang === "zh-CN" ? "chinese" : target_lang
 				};
-				console.log(target_lang, source_lang);
 				if (source_lang && source_lang !== "auto") {
 					aiParams.source_lang = source_lang;
 				}
@@ -43,10 +45,10 @@ export default {
 					text: response.translated_text
 				};
 			}));
-
-			return new Response(JSON.stringify({ translations }));
+	
+			return new Response(JSON.stringify({ translations, message: 'ok' }));
 		} catch (error) {
-			return new Response('Internal Server Error', { status: 500 });
+			return new Response(JSON.stringify({ message: 'Internal Server Error' }), { status: 500 });
 		}
 	},
 }
